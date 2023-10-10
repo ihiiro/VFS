@@ -14,3 +14,9 @@ The User Interface (UI):
 A Unix-like command line interface. It allows at least READ,WRITE,DELETE,MOVE operations.
 
 VFS has atleast the concept of both files and directories.
+
+===============
+VSD DRIVER
+
+The driver reads in 1 block per read, this implies that a memory buffer needs to be maintained with a size that is atleast equal to VSD block size.
+===============
