@@ -1,0 +1,16 @@
+Goal of VFS:
+Create a filesystem on top of another filesystem.
+
+The Virtual Storage Drive (VSD):
+An unstructured empty file with reserved space on a mounted "real" file system. It serves as an emulation of a storage device.
+
+The VSD driver:
+A piece of code that interfaces directly with the VSD. Middleware between VFS and VSD.
+
+The Virtual File System (VFS):
+The actual code that initializes/manages the VSD volume.
+
+The User Interface (UI):
+A Unix-like command line interface. It allows at least READ,WRITE,DELETE,MOVE operations.
+
+VFS has atleast the concept of both files and directories.
