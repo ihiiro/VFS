@@ -24,3 +24,38 @@ SOFTWARE.
 
 */
  
+#ifndef VSD_DRIVER_H
+# define VSD_DRIVER_H
+
+# include <sys/types.h>
+
+// structs
+struct driver_status
+{
+	char	*status;
+	int		errrno;
+};
+
+// common values
+# define VSD_BLOCK_SIZE 1024 /* in bytes */
+# define VSD "vsd" /* vsd path/filename */
+
+// common driver status messages
+# define OPEN_ERROR "DRIVER_OPEN_ERRNO"
+# define READ_ERROR "DRIVER_READ_ERRNO"
+# define WRITE_ERROR "DRIVER_WRITE_ERRNO"
+# define LSEEK_ERROR "DRIVER_LSEEK_ERRNO"
+# define CLOSE_ERROR "DRIVER_CLOSE_ERRNO"
+
+# define OPEN_SUCCESS "DRIVER_OPEN_SUCCESS"
+# define READ_SUCCESS "DRIVER_READ_SUCCESS"
+# define WRITE_SUCCESS "DRIVER_WRITE_SUCCESS"
+# define LSEEK_SUCCESS "DRIVER_LSEEK_SUCCESS"
+
+// functions
+void					read_block(unsigned int block_index);
+char					*return_buffer();
+off_t					return_vsd_size();
+struct driver_status	return_driver_status();
+
+#endif

@@ -24,3 +24,116 @@ SOFTWARE.
 
 */
  
+#include "vsd-driver.h"
+#include <fcntl.h>
+#include <errno.h>
+#include <stdio.h>
+#include <unistd.h>
+
+char					BUF[VSD_BLOCK_SIZE]; /* stores VSD block reads */
+struct driver_status	DRIVER_STATUS; /* latest driver call status */
+
+struct driver_status	return_driver_status()
+{
+	return DRIVER_STATUS;
+}
+
+off_t	return_vsd_size()
+{
+	int		fd;
+	off_t	size;
+
+	fd = open(VSD, O_RDONLY);
+	if (fd == -1)
+    {
+        if (close(fd) == -1)
+		{
+			DRIVER_STATUS.status = CLOSE_ERROR;
+			DRIVER_STATUS.errrno = errno;
+			return (-1);
+		}
+        DRIVER_STATUS.status = OPEN_ERROR;
+        DRIVER_STATUS.errrno = errno;
+		return (-1);
+    }
+	size = lseek(fd, 0, SEEK_END);
+	if (size == -1)
+	{
+		if (close(fd) == -1)
+		{
+			DRIVER_STATUS.status = CLOSE_ERROR;
+			DRIVER_STATUS.errrno = errno;
+			return (-1);
+		}
+		DRIVER_STATUS.status = LSEEK_ERROR;
+		DRIVER_STATUS.errrno = errno;
+		return (-1);
+	}
+	if (close(fd) == -1)
+	{
+		DRIVER_STATUS.status = CLOSE_ERROR;
+		DRIVER_STATUS.errrno = errno;
+		return (-1);
+	}
+	DRIVER_STATUS.status = READ_SUCCESS;
+	DRIVER_STATUS.errrno = 0;
+	return (size);
+}
+
+char	*return_buffer()
+{
+	return (BUF);
+}
+
+void	read_block(unsigned int block_index)
+{
+    int     fd;
+
+    fd = open(VSD, O_RDONLY);
+	if (fd == -1)
+    {
+        if (close(fd) == -1)
+		{
+			DRIVER_STATUS.status = CLOSE_ERROR;
+			DRIVER_STATUS.errrno = errno;
+			return;
+		}
+        DRIVER_STATUS.status = OPEN_ERROR;
+        DRIVER_STATUS.errrno = errno;
+		return;
+    }
+	if (lseek(fd, block_index * VSD_BLOCK_SIZE, SEEK_SET) == -1)
+	{
+		if (close(fd) == -1)
+		{
+			DRIVER_STATUS.status = CLOSE_ERROR;
+			DRIVER_STATUS.errrno = errno;
+			return;
+		}
+		DRIVER_STATUS.status = LSEEK_ERROR;
+		DRIVER_STATUS.errrno = errno;
+		return;
+	}
+    if (read(fd, BUF, VSD_BLOCK_SIZE) == -1)
+    {
+        if (close(fd) == -1)
+		{
+			DRIVER_STATUS.status = CLOSE_ERROR;
+			DRIVER_STATUS.errrno = errno;
+			return;
+		}
+        DRIVER_STATUS.status = READ_ERROR;
+        DRIVER_STATUS.errrno = errno;
+		return;
+    }
+	DRIVER_STATUS.status = READ_SUCCESS;
+	DRIVER_STATUS.errrno = errno;
+    if (close(fd) == -1)
+	{
+		DRIVER_STATUS.status = CLOSE_ERROR;
+		DRIVER_STATUS.errrno = errno;
+		return;
+	}
+	DRIVER_STATUS.status = READ_SUCCESS;
+	DRIVER_STATUS.errrno = 0;
+}
