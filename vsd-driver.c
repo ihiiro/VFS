@@ -35,7 +35,7 @@ struct driver_status	DRIVER_STATUS; /* latest driver call status */
 
 struct driver_status	return_driver_status()
 {
-	return DRIVER_STATUS;
+	return (DRIVER_STATUS);
 }
 
 off_t	return_vsd_size()
