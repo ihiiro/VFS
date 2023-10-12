@@ -46,12 +46,6 @@ off_t	return_vsd_size()
 	fd = open(VSD, O_RDONLY);
 	if (fd == -1)
     {
-        if (close(fd) == -1)
-		{
-			DRIVER_STATUS.status = CLOSE_ERROR;
-			DRIVER_STATUS.errrno = errno;
-			return (-1);
-		}
         DRIVER_STATUS.status = OPEN_ERROR;
         DRIVER_STATUS.errrno = errno;
 		return (-1);
@@ -92,12 +86,6 @@ void	read_block_to_buffer(unsigned int block_index)
     fd = open(VSD, O_RDONLY);
 	if (fd == -1)
     {
-        if (close(fd) == -1)
-		{
-			DRIVER_STATUS.status = CLOSE_ERROR;
-			DRIVER_STATUS.errrno = errno;
-			return;
-		}
         DRIVER_STATUS.status = OPEN_ERROR;
         DRIVER_STATUS.errrno = errno;
 		return;

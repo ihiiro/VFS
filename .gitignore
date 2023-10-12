@@ -1,5 +1,3 @@
-.stamplist
-vsd
-.cstamp
-a.out
 testing.c
+vsd-driver/vsd
+tests/vsd-driver
