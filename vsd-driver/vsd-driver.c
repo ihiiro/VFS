@@ -38,6 +38,11 @@ struct driver_status	return_driver_status()
 	return (DRIVER_STATUS);
 }
 
+/*
+
+	returns the size in bytes of the VSD
+
+*/
 off_t	return_vsd_size()
 {
 	int		fd;
@@ -74,11 +79,21 @@ off_t	return_vsd_size()
 	return (size);
 }
 
+/*
+
+	returns the central buffer
+
+*/
 char	*return_buffer()
 {
 	return (BUF);
 }
 
+/*
+
+	reads a block from VSD (zero indexed) into the central buffer
+
+*/
 void	read_block_to_buffer(unsigned int block_index)
 {
     int     fd;
@@ -115,13 +130,10 @@ void	read_block_to_buffer(unsigned int block_index)
 		return;
     }
 	DRIVER_STATUS.status = READ_SUCCESS;
-	DRIVER_STATUS.errrno = errno;
+	DRIVER_STATUS.errrno = 0;
     if (close(fd) == -1)
 	{
 		DRIVER_STATUS.status = CLOSE_ERROR;
 		DRIVER_STATUS.errrno = errno;
-		return;
 	}
-	DRIVER_STATUS.status = READ_SUCCESS;
-	DRIVER_STATUS.errrno = 0;
 }
