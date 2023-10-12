@@ -37,12 +37,32 @@ SOFTWARE.
 
 int main(void)
 {
+    /* testing base I/O calls */
     read_block_to_buffer(0);
-    assert(strcmp(return_driver_status().status, READ_SUCCESS) == 0);
-    assert(return_driver_status().errrno == 0);
+    assert(strcmp(return_driver_status().status, READ_SUCCESS) == 0 && "read_block_to_buffer()");
+    assert(return_driver_status().errrno == 0 && "read_block_to_buffer()");
     return_vsd_size();
-    assert(strcmp(return_driver_status().status, READ_SUCCESS) == 0);
-    assert(return_driver_status().errrno == 0);
+    assert(strcmp(return_driver_status().status, READ_SUCCESS) == 0 && "return_vsd_size()");
+    assert(return_driver_status().errrno == 0 && "return_vsd_size()");
+    write_to_block(0, 2, "ll ", 2);
+    assert(strcmp(return_driver_status().status, WRITE_SUCCESS) == 0 && "write_to_block()");
+
+    /* testing emulation controls */
+    read_block_to_buffer(VSD_BLOCK_SIZE * VSD_BLOCK_SIZE);
+    assert(strcmp(return_driver_status().status, VREXCEED_ERROR) == 0 && "read_block_to_buffer()");
+    assert(return_driver_status().errrno == -1 && "read_block_to_buffer()");
+    write_to_block(VSD_BLOCK_SIZE * VSD_BLOCK_SIZE, 0, "ll", 2);
+    assert(strcmp(return_driver_status().status, VWEXCEED_ERROR) == 0 && "write_to_block()");
+    assert(return_driver_status().errrno == -1 && "write_to_block()");
+    write_to_block(-1, 2, "ll", 2);
+    assert(strcmp(return_driver_status().status, BINDEX_ERROR) == 0 && "write_to_block()");
+    assert(return_driver_status().errrno == -1 && "write_to_block()");
+    write_to_block(0, -1, "ll", 2);
+    assert(strcmp(return_driver_status().status, OFFSET_ERROR) == 0 && "write_to_block()");
+    assert(return_driver_status().errrno == -1 && "write_to_block()");
+    write_to_block(0, VSD_BLOCK_SIZE, "ll", 2);
+    assert(strcmp(return_driver_status().status, EXCEED_ERROR) == 0 && "write_to_block()");
+    assert(return_driver_status().errrno == -1 && "write_to_block()");
 
     return (0);
 }

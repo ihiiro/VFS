@@ -40,22 +40,29 @@ struct driver_status
 # define VSD_BLOCK_SIZE 1024 /* in bytes */
 # define VSD "/home/hiro/projects/vfs/vsd-driver/vsd" /* vsd path/filename */
 
-// common driver status messages
+// i/o driver messages
 # define OPEN_ERROR "DRIVER_OPEN_ERRNO"
 # define READ_ERROR "DRIVER_READ_ERRNO"
 # define WRITE_ERROR "DRIVER_WRITE_ERRNO"
 # define LSEEK_ERROR "DRIVER_LSEEK_ERRNO"
 # define CLOSE_ERROR "DRIVER_CLOSE_ERRNO"
-
 # define OPEN_SUCCESS "DRIVER_OPEN_SUCCESS"
 # define READ_SUCCESS "DRIVER_READ_SUCCESS"
 # define WRITE_SUCCESS "DRIVER_WRITE_SUCCESS"
 # define LSEEK_SUCCESS "DRIVER_LSEEK_SUCCESS"
 
+// other driver messages
+# define EXCEED_ERROR "DRIVER_WRITE_EXEEDED_BLOCK"
+# define BINDEX_ERROR "DRIVER_READ_NEGATIVE_BLOCK"
+# define OFFSET_ERROR "DRIVER_WRITE_NEGATIVE_OFFSET"
+# define VREXCEED_ERROR "DRIVER_READ_EXCEEDS_VSD"
+# define VWEXCEED_ERROR "DRIVER_WRITE_EXCEEDS_VSD"
+
 // functions
-void					read_block_to_buffer(unsigned int block_index);
+void					read_block_to_buffer(int block_index);
 char					*return_buffer();
 off_t					return_vsd_size();
 struct driver_status	return_driver_status();
+void					write_to_block(int block_index, int offset, char *buf, int size);
 
 #endif
