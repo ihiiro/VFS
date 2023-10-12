@@ -46,7 +46,20 @@ The driver reads in 1 block per read, this implies that a memory buffer needs to
 The VSD block size is assumed to be 1024 bytes.
 
 READING BLOCKS
-read_block() takes a block index, reads it, and returns its contents.
+void	read_block_to_buffer(unsigned int block_index)
+reads a full block as instructed via the block_index argument (0 indexed) into a central buffer.
+
+RETURNING VSD SIZE
+off_t	return_vsd_size()
+returns the vsd size in bytes.
+
+RETURNING BLOCK DATA
+char					*return_buffer();
+returns the central buffer.
+
+DRIVER STATUS INFORMATION
+struct driver_status	return_driver_status();
+returns the latest driver status.
 
 ===========================================================================================================================================================
 

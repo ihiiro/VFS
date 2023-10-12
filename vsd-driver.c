@@ -85,7 +85,7 @@ char	*return_buffer()
 	return (BUF);
 }
 
-void	read_block(unsigned int block_index)
+void	read_block_to_buffer(unsigned int block_index)
 {
     int     fd;
 

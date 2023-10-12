@@ -53,7 +53,7 @@ struct driver_status
 # define LSEEK_SUCCESS "DRIVER_LSEEK_SUCCESS"
 
 // functions
-void					read_block(unsigned int block_index);
+void					read_block_to_buffer(unsigned int block_index);
 char					*return_buffer();
 off_t					return_vsd_size();
 struct driver_status	return_driver_status();
