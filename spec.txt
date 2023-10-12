@@ -49,6 +49,10 @@ READING BLOCKS
 void	read_block_to_buffer(unsigned int block_index)
 reads a full block as instructed via the block_index argument (0 indexed) into a central buffer.
 
+WRITING TO BLOCKS
+void	write_to_block(int block_index, int offset, char *buf, int size)
+writes to a block in the VSD.
+
 RETURNING VSD SIZE
 off_t	return_vsd_size()
 returns the vsd size in bytes.
@@ -60,6 +64,7 @@ returns the central buffer.
 DRIVER STATUS INFORMATION
 struct driver_status	return_driver_status();
 returns the latest driver status.
+
 
 ===========================================================================================================================================================
 
