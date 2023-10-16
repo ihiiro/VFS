@@ -45,7 +45,7 @@ sll_headnode_t	*return_driver_status_log()
 void	initialize_driver_status()
 {
 	DRIVER_STATUS_LOG = new_list();
-	DRIVER_STATUS.status = (char*)malloc(sizeof(char) * 40);
+	DRIVER_STATUS.status = (char*)malloc(sizeof(char) * 50);
 	if (!DRIVER_STATUS.status)
 	{
 		DRIVER_STATUS.errrno = -1;
@@ -60,6 +60,11 @@ void	free_driver_status()
 	free(DRIVER_STATUS.status);
 }
 
+/*
+
+	update DRIVER_STATUS as well as return 0 or 1 on fail/success
+
+*/
 int	handle(int fd, int val, char *err_msg, char *suc_msg, int type)
 {
 	char	buf[3];
@@ -102,12 +107,12 @@ void	write_to_block(int block_index, int offset, char *buf, int size)
 	fd = open(VSD, O_WRONLY);
 	if (!handle(fd, fd, OPEN_ERROR, OPEN_SUCCESS, BASE))
 		return;
-	else if (!handle(fd, block_index < 0, BINDEX_ERROR, BINDEX_SUCCESS, CONTROL))
+	else if (!handle(fd, block_index < 0, WBINDEX_ERROR, WBINDEX_SUCCESS, CONTROL))
 		return;
 	else if (!handle(fd, offset < 0, OFFSET_ERROR, OFFSET_SUCCESS, CONTROL))
 		return;
 	else if (!handle(fd, offset >= VSD_BLOCK_SIZE
-		|| size > VSD_BLOCK_SIZE || size + offset > VSD_BLOCK_SIZE, EXCEED_ERROR, NEXCEED_SUCCESS, CONTROL))
+		|| size > VSD_BLOCK_SIZE || size + offset > VSD_BLOCK_SIZE, BEXCEED_ERROR, NEXCEED_SUCCESS, CONTROL))
 		return;
 	pos = lseek(fd, block_index * VSD_BLOCK_SIZE + offset, SEEK_SET);
 	if (!handle(fd, pos, LSEEK_ERROR, LSEEK_SUCCESS, BASE))
@@ -169,7 +174,7 @@ void	read_block_to_buffer(int block_index)
 	fd = open(VSD, O_RDONLY);
 	if (!handle(fd, fd, OPEN_ERROR, OPEN_SUCCESS, BASE))
 		return;
-	else if (!handle(fd, block_index < 0, BINDEX_ERROR, BINDEX_SUCCESS, CONTROL))
+	else if (!handle(fd, block_index < 0, RBINDEX_ERROR, RBINDEX_SUCCESS, CONTROL))
 		return;
 	pos = lseek(fd, block_index * VSD_BLOCK_SIZE, SEEK_SET);
 	if (!handle(fd, pos, LSEEK_ERROR, LSEEK_SUCCESS, BASE))
