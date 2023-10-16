@@ -25,35 +25,67 @@ SOFTWARE.
 */
  
 #include "vsd-driver.h"
+#include "singly-linked-list.h"
 #include <fcntl.h>
 #include <errno.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 
 char					BUF[VSD_BLOCK_SIZE]; /* central read buffer */
 struct driver_status	DRIVER_STATUS; /* latest driver call status */
+sll_headnode_t			DRIVER_STATUS_LIST; /*  */
+
+sll_headnode_t	*return_driver_status_list()
+{
+	return (&DRIVER_STATUS_LIST);
+}
 
 void	initialize_driver_status()
 {
+	DRIVER_STATUS_LIST = new_list();
 	DRIVER_STATUS.status = (char*)malloc(sizeof(char) * 40);
+	if (!DRIVER_STATUS.status)
+	{
+		DRIVER_STATUS.errrno = -1;
+		return;
+	}
 	DRIVER_STATUS.errrno = 0;
+}
+
+void	free_driver_status()
+{
+	free_sll(&DRIVER_STATUS_LIST);
+	free(DRIVER_STATUS.status);
 }
 
 int	handle(int fd, int val, char *err_msg, char *suc_msg, int type)
 {
+	char	buf[3];
+
 	if ((val < 0 && type == BASE) || (val && type == CONTROL)) /* if it's a BASE error or if it's a CONTROL error */
 	{
 		strcpy(DRIVER_STATUS.status, err_msg);
 		DRIVER_STATUS.errrno = (type == BASE) ? errno : -1; /* the second condition is assumed to be type == CONTROL */
+		append(&DRIVER_STATUS_LIST, DRIVER_STATUS.status);
+		sprintf(buf, "%d", DRIVER_STATUS.errrno);
+		append(&DRIVER_STATUS_LIST, buf);
 		if (close(fd) < 0)
 		{
 			DRIVER_STATUS.status = HCLOSE_ERROR;
 			DRIVER_STATUS.errrno = errno;
+			append(&DRIVER_STATUS_LIST, DRIVER_STATUS.status);
+			sprintf(buf, "%d", DRIVER_STATUS.errrno);
+			append(&DRIVER_STATUS_LIST, buf);
 		}
 		return (0);
 	}
 	strcpy(DRIVER_STATUS.status, suc_msg);
 	DRIVER_STATUS.errrno = 0;
+	append(&DRIVER_STATUS_LIST, DRIVER_STATUS.status);
+	sprintf(buf, "%d", DRIVER_STATUS.errrno);
+	append(&DRIVER_STATUS_LIST, buf);
 	return (1);
 }
 

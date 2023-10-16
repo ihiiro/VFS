@@ -1,5 +1,3 @@
-/*
-
 MIT License
 
 Copyright (c) 2023 Hiro
@@ -21,34 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-*/
- 
-#include "vsd-driver.h"
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
-
-void    print(sll_t *node)
-{
-    printf("%s\n", node->payload);
-}
-
-/*
-
-    tests for the VSD driver
-
-*/
-
-int main(void)
-{
-    initialize_driver_status();
-    read_block_to_buffer(0);
-    return_vsd_size();
-    return_driver_status();
-    write_to_block(0, 1, "hey", 3);
-    traverse(return_driver_status_list(), print);
-    free_driver_status();
-
-    return (0);
-}

@@ -28,6 +28,7 @@ SOFTWARE.
 # define VSD_DRIVER_H
 
 # include <sys/types.h>
+#include "singly-linked-list.h"
 
 // structs
 struct driver_status
@@ -56,12 +57,12 @@ struct driver_status
 # define LSEEK_SUCCESS "DRIVER_LSEEK_SUCCESS"
 
 // control messages
-# define EXCEED_ERROR "DRIVER_WRITE_EXEEDED_BLOCK"
-# define BINDEX_ERROR "DRIVER_READ_NEGATIVE_BLOCK"
+# define EXCEED_ERROR "DRIVER_WRITE_EXEEDED_BLOCK_ERROR"
+# define BINDEX_ERROR "DRIVER_NEGATIVE_BLOCK_INDEX_ERROR"
 # define OFFSET_ERROR "DRIVER_WRITE_NEGATIVE_OFFSET"
 # define VREXCEED_ERROR "DRIVER_READ_EXCEEDS_VSD"
 # define VWEXCEED_ERROR "DRIVER_WRITE_EXCEEDS_VSD"
-# define BINDEX_SUCCESS "DRIVER_READ_BLOCK_SUCCESS"
+# define BINDEX_SUCCESS "DRIVER_VALID_BLOCK_INDEX_SUCCESS"
 # define OFFSET_SUCCESS "DRIVER_WRITE_OFFSET_SUCCESS"
 # define NEXCEED_SUCCESS "DRIVER_WRITE_WITHIN_BLOCK_SUCCESS"
 # define VWNEXCEED_SUCCESS "DRIVER_WRITE_WITHIN_VSD_SUCCESS"
@@ -74,5 +75,7 @@ off_t					return_vsd_size();
 struct driver_status	return_driver_status();
 void					write_to_block(int block_index, int offset, char *buf, int size);
 void					initialize_driver_status();
+void					free_driver_status();
+sll_headnode_t			*return_driver_status_list();
 
 #endif
