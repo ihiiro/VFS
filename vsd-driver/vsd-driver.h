@@ -76,6 +76,6 @@ struct driver_status	return_driver_status();
 void					write_to_block(int block_index, int offset, char *buf, int size);
 void					initialize_driver_status();
 void					free_driver_status();
-sll_headnode_t			*return_driver_status_list();
+sll_headnode_t			*return_driver_status_log();
 
 #endif

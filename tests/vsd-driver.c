@@ -47,7 +47,7 @@ int main(void)
     return_vsd_size();
     return_driver_status();
     write_to_block(0, 1, "hey", 3);
-    traverse(return_driver_status_list(), print);
+    traverse(return_driver_status_log(), print);
     free_driver_status();
 
     return (0);

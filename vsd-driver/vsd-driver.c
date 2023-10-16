@@ -35,16 +35,16 @@ SOFTWARE.
 
 char					BUF[VSD_BLOCK_SIZE]; /* central read buffer */
 struct driver_status	DRIVER_STATUS; /* latest driver call status */
-sll_headnode_t			DRIVER_STATUS_LIST; /*  */
+sll_headnode_t			DRIVER_STATUS_LOG; /* singly linked list that holds DRIVER_STATUS logs in FIFO order */
 
-sll_headnode_t	*return_driver_status_list()
+sll_headnode_t	*return_driver_status_log()
 {
-	return (&DRIVER_STATUS_LIST);
+	return (&DRIVER_STATUS_LOG);
 }
 
 void	initialize_driver_status()
 {
-	DRIVER_STATUS_LIST = new_list();
+	DRIVER_STATUS_LOG = new_list();
 	DRIVER_STATUS.status = (char*)malloc(sizeof(char) * 40);
 	if (!DRIVER_STATUS.status)
 	{
@@ -56,7 +56,7 @@ void	initialize_driver_status()
 
 void	free_driver_status()
 {
-	free_sll(&DRIVER_STATUS_LIST);
+	free_sll(&DRIVER_STATUS_LOG);
 	free(DRIVER_STATUS.status);
 }
 
@@ -68,24 +68,24 @@ int	handle(int fd, int val, char *err_msg, char *suc_msg, int type)
 	{
 		strcpy(DRIVER_STATUS.status, err_msg);
 		DRIVER_STATUS.errrno = (type == BASE) ? errno : -1; /* the second condition is assumed to be type == CONTROL */
-		append(&DRIVER_STATUS_LIST, DRIVER_STATUS.status);
+		append(&DRIVER_STATUS_LOG, DRIVER_STATUS.status);
 		sprintf(buf, "%d", DRIVER_STATUS.errrno);
-		append(&DRIVER_STATUS_LIST, buf);
+		append(&DRIVER_STATUS_LOG, buf);
 		if (close(fd) < 0)
 		{
 			DRIVER_STATUS.status = HCLOSE_ERROR;
 			DRIVER_STATUS.errrno = errno;
-			append(&DRIVER_STATUS_LIST, DRIVER_STATUS.status);
+			append(&DRIVER_STATUS_LOG, DRIVER_STATUS.status);
 			sprintf(buf, "%d", DRIVER_STATUS.errrno);
-			append(&DRIVER_STATUS_LIST, buf);
+			append(&DRIVER_STATUS_LOG, buf);
 		}
 		return (0);
 	}
 	strcpy(DRIVER_STATUS.status, suc_msg);
 	DRIVER_STATUS.errrno = 0;
-	append(&DRIVER_STATUS_LIST, DRIVER_STATUS.status);
+	append(&DRIVER_STATUS_LOG, DRIVER_STATUS.status);
 	sprintf(buf, "%d", DRIVER_STATUS.errrno);
-	append(&DRIVER_STATUS_LIST, buf);
+	append(&DRIVER_STATUS_LOG, buf);
 	return (1);
 }
 
@@ -102,91 +102,22 @@ void	write_to_block(int block_index, int offset, char *buf, int size)
 	fd = open(VSD, O_WRONLY);
 	if (!handle(fd, fd, OPEN_ERROR, OPEN_SUCCESS, BASE))
 		return;
-	// if (fd == -1)
-    // {
-    //     DRIVER_STATUS.status = OPEN_ERROR;
-    //     DRIVER_STATUS.errrno = errno;
-	// 	return;
-    // }
 	else if (!handle(fd, block_index < 0, BINDEX_ERROR, BINDEX_SUCCESS, CONTROL))
 		return;
-	// if (block_index < 0)
-	// {
-	// 	DRIVER_STATUS.status = BINDEX_ERROR;
-	// 	DRIVER_STATUS.errrno = -1;
-	// 	return;
-	// }
 	else if (!handle(fd, offset < 0, OFFSET_ERROR, OFFSET_SUCCESS, CONTROL))
 		return;
-	// else if (offset < 0)
-	// {
-	// 	DRIVER_STATUS.status = OFFSET_ERROR;
-	// 	DRIVER_STATUS.errrno = -1;
-	// 	return;
-	// }
 	else if (!handle(fd, offset >= VSD_BLOCK_SIZE
 		|| size > VSD_BLOCK_SIZE || size + offset > VSD_BLOCK_SIZE, EXCEED_ERROR, NEXCEED_SUCCESS, CONTROL))
 		return;
-	// else if (offset >= VSD_BLOCK_SIZE
-	// 	|| size > VSD_BLOCK_SIZE || size + offset > VSD_BLOCK_SIZE)
-	// {
-	// 	DRIVER_STATUS.status = EXCEED_ERROR;
-	// 	DRIVER_STATUS.errrno = -1;
-	// 	return;
-	// }
 	pos = lseek(fd, block_index * VSD_BLOCK_SIZE + offset, SEEK_SET);
 	if (!handle(fd, pos, LSEEK_ERROR, LSEEK_SUCCESS, BASE))
 		return;
-	// if (pos == -1)
-	// {
-	// 	if (close(fd) == -1)
-	// 	{
-	// 		DRIVER_STATUS.status = CLOSE_ERROR;
-	// 		DRIVER_STATUS.errrno = errno;
-	// 		return;
-	// 	}
-	// 	DRIVER_STATUS.status = LSEEK_ERROR;
-	// 	DRIVER_STATUS.errrno = errno;
-	// 	return;
-	// }
 	else if (!handle(fd, pos >= return_vsd_size(), VWEXCEED_ERROR, VWNEXCEED_SUCCESS, CONTROL))
 		return;
-	// else if (pos >= return_vsd_size())
-	// {
-	// 	if (close(fd) == -1)
-	// 	{
-	// 		DRIVER_STATUS.status = CLOSE_ERROR;
-	// 		DRIVER_STATUS.errrno = errno;
-	// 		return;
-	// 	}
-	// 	DRIVER_STATUS.status = VWEXCEED_ERROR;
-	// 	DRIVER_STATUS.errrno = -1;
-	// 	return;
-	// }
 	else if (!handle(fd, write(fd, buf, size), WRITE_ERROR, WRITE_SUCCESS, BASE))
 		return;
-	// if (write(fd, buf, size) == -1)
-	// {
-	// 	if (close(fd) == -1)
-	// 	{
-	// 		DRIVER_STATUS.status = CLOSE_ERROR;
-	// 		DRIVER_STATUS.errrno = errno;
-	// 		return;
-	// 	}
-	// 	DRIVER_STATUS.status = WRITE_ERROR;
-	// 	DRIVER_STATUS.errrno = errno;
-	// 	return;
-	// }
 	else if (!handle(fd, close(fd), CLOSE_ERROR, CLOSE_SUCCESS, BASE))
 		return;
-	// if (close(fd) == -1)
-	// {
-	// 	DRIVER_STATUS.status = CLOSE_ERROR;
-	// 	DRIVER_STATUS.errrno = errno;
-	// 	return;
-	// }
-	// DRIVER_STATUS.status = WRITE_SUCCESS;
-	// DRIVER_STATUS.errrno = 0;
 }
 
 struct driver_status	return_driver_status()
@@ -207,37 +138,11 @@ off_t	return_vsd_size()
 	fd = open(VSD, O_RDONLY);
 	if (!handle(fd, fd, OPEN_ERROR, OPEN_SUCCESS, BASE))
 		return (-1);
-	// if (fd == -1)
-    // {
-    //     DRIVER_STATUS.status = OPEN_ERROR;
-    //     DRIVER_STATUS.errrno = errno;
-	// 	return (-1);
-    // }
 	size = lseek(fd, 0, SEEK_END);
 	if (!handle(fd, size, LSEEK_ERROR, LSEEK_SUCCESS, BASE))
 		return (-1);
-	// if (size == -1)
-	// {
-	// 	if (close(fd) == -1)
-	// 	{
-	// 		DRIVER_STATUS.status = CLOSE_ERROR;
-	// 		DRIVER_STATUS.errrno = errno;
-	// 		return (-1);
-	// 	}
-	// 	DRIVER_STATUS.status = LSEEK_ERROR;
-	// 	DRIVER_STATUS.errrno = errno;
-	// 	return (-1);
-	// }
 	else if (!handle(fd, close(fd), CLOSE_ERROR, CLOSE_SUCCESS, BASE))
 		return (-1);
-	// if (close(fd) == -1)
-	// {
-	// 	DRIVER_STATUS.status = CLOSE_ERROR;
-	// 	DRIVER_STATUS.errrno = errno;
-	// 	return (-1);
-	// }
-	// DRIVER_STATUS.status = READ_SUCCESS;
-	// DRIVER_STATUS.errrno = 0;
 	return (size);
 }
 
@@ -264,70 +169,15 @@ void	read_block_to_buffer(int block_index)
 	fd = open(VSD, O_RDONLY);
 	if (!handle(fd, fd, OPEN_ERROR, OPEN_SUCCESS, BASE))
 		return;
-	// if (fd == -1)
-    // {
-    //     DRIVER_STATUS.status = OPEN_ERROR;
-    //     DRIVER_STATUS.errrno = errno;
-	// 	return;
-    // }
 	else if (!handle(fd, block_index < 0, BINDEX_ERROR, BINDEX_SUCCESS, CONTROL))
 		return;
-	// if (block_index < 0)
-	// {
-	// 	DRIVER_STATUS.status = BINDEX_ERROR;
-	// 	DRIVER_STATUS.errrno = -1;
-	// 	return;
-	// }
 	pos = lseek(fd, block_index * VSD_BLOCK_SIZE, SEEK_SET);
 	if (!handle(fd, pos, LSEEK_ERROR, LSEEK_SUCCESS, BASE))
 		return;
-	// if (pos == -1)
-	// {
-	// 	if (close(fd) == -1)
-	// 	{
-	// 		DRIVER_STATUS.status = CLOSE_ERROR;
-	// 		DRIVER_STATUS.errrno = errno;
-	// 		return;
-	// 	}
-	// 	DRIVER_STATUS.status = LSEEK_ERROR;
-	// 	DRIVER_STATUS.errrno = errno;
-	// 	return;
-	// }
 	else if (!handle(fd, pos >= return_vsd_size(), VREXCEED_ERROR, VRNEXCEED_SUCCESS, CONTROL))
 		return;
-	// else if (pos >= return_vsd_size())
-	// {
-	// 	if (close(fd) == -1)
-	// 	{
-	// 		DRIVER_STATUS.status = CLOSE_ERROR;
-	// 		DRIVER_STATUS.errrno = errno;
-	// 		return;
-	// 	}
-	// 	DRIVER_STATUS.status = VREXCEED_ERROR;
-	// 	DRIVER_STATUS.errrno = -1;
-	// 	return;
-	// }
 	else if (!handle(fd, read(fd, BUF, VSD_BLOCK_SIZE), READ_ERROR, READ_SUCCESS, BASE))
 		return;
-    // if (read(fd, BUF, VSD_BLOCK_SIZE) == -1)
-    // {
-    //     if (close(fd) == -1)
-	// 	{
-	// 		DRIVER_STATUS.status = CLOSE_ERROR;
-	// 		DRIVER_STATUS.errrno = errno;
-	// 		return;
-	// 	}
-    //     DRIVER_STATUS.status = READ_ERROR;
-    //     DRIVER_STATUS.errrno = errno;
-	// 	return;
-    // }
-	// DRIVER_STATUS.status = READ_SUCCESS;
-	// DRIVER_STATUS.errrno = 0;
 	else if (!handle(fd, close(fd), CLOSE_ERROR, CLOSE_SUCCESS, BASE))
 		return;
-    // if (close(fd) == -1)
-	// {
-	// 	DRIVER_STATUS.status = CLOSE_ERROR;
-	// 	DRIVER_STATUS.errrno = errno;
-	// }
 }
