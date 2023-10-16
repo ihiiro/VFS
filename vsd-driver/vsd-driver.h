@@ -39,24 +39,33 @@ struct driver_status
 // common values
 # define VSD_BLOCK_SIZE 1024 /* in bytes */
 # define VSD "/home/hiro/projects/vfs/vsd-driver/vsd" /* vsd path/filename */
+# define BASE 0
+# define CONTROL 1
 
-// i/o driver messages
+// base messages
 # define OPEN_ERROR "DRIVER_OPEN_ERRNO"
 # define READ_ERROR "DRIVER_READ_ERRNO"
 # define WRITE_ERROR "DRIVER_WRITE_ERRNO"
 # define LSEEK_ERROR "DRIVER_LSEEK_ERRNO"
 # define CLOSE_ERROR "DRIVER_CLOSE_ERRNO"
+# define HCLOSE_ERROR "DRIVER_HANDLE_CLOSE_ERRRNO"
+# define CLOSE_SUCCESS "DRIVER_CLOSE_SUCCESS"
 # define OPEN_SUCCESS "DRIVER_OPEN_SUCCESS"
 # define READ_SUCCESS "DRIVER_READ_SUCCESS"
 # define WRITE_SUCCESS "DRIVER_WRITE_SUCCESS"
 # define LSEEK_SUCCESS "DRIVER_LSEEK_SUCCESS"
 
-// other driver messages
+// control messages
 # define EXCEED_ERROR "DRIVER_WRITE_EXEEDED_BLOCK"
 # define BINDEX_ERROR "DRIVER_READ_NEGATIVE_BLOCK"
 # define OFFSET_ERROR "DRIVER_WRITE_NEGATIVE_OFFSET"
 # define VREXCEED_ERROR "DRIVER_READ_EXCEEDS_VSD"
 # define VWEXCEED_ERROR "DRIVER_WRITE_EXCEEDS_VSD"
+# define BINDEX_SUCCESS "DRIVER_READ_BLOCK_SUCCESS"
+# define OFFSET_SUCCESS "DRIVER_WRITE_OFFSET_SUCCESS"
+# define NEXCEED_SUCCESS "DRIVER_WRITE_WITHIN_BLOCK_SUCCESS"
+# define VWNEXCEED_SUCCESS "DRIVER_WRITE_WITHIN_VSD_SUCCESS"
+# define VRNEXCEED_SUCCESS "DRIVER_READ_WITHIN_VSD_SUCCESS"
 
 // functions
 void					read_block_to_buffer(int block_index);
@@ -64,5 +73,6 @@ char					*return_buffer();
 off_t					return_vsd_size();
 struct driver_status	return_driver_status();
 void					write_to_block(int block_index, int offset, char *buf, int size);
+void					initialize_driver_status();
 
 #endif
