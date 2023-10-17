@@ -29,9 +29,18 @@ SOFTWARE.
 #include <string.h>
 #include <stdio.h>
 
+char	BUFF[1000];
+int		INDEX = 0;
+
 void    print(sll_t *node)
 {
     printf("%s\n", node->payload);
+}
+
+void	fill_test_buffer(sll_t *node)
+{
+	strcpy(BUFF + INDEX, node->payload);
+	INDEX += strlen(node->payload);
 }
 
 /*
@@ -40,14 +49,33 @@ void    print(sll_t *node)
 
 */
 
+# define READ_0 "DRIVER_OPEN_SUCCESS0DRIVER_READ_VALID_BLOCK_INDEX_SUCCESS0DRIVER_LSEEK_SUCCESS0DRIVER_OPEN_SUCCESS0DRIVER_LSEEK_SUCCESS0DRIVER_CLOSE_SUCCESS0DRIVER_READ_WITHIN_VSD_SUCCESS0DRIVER_READ_SUCCESS0DRIVER_CLOSE_SUCCESS0"
+# define READ_1 "DRIVER_OPEN_SUCCESS0DRIVER_READ_NEGATIVE_BLOCK_INDEX_ERROR-1DRIVER_CLOSE_SUCCESS0"
+
 int main(void)
 {
+	/* READ_0 test */
     initialize_driver_status();
     read_block_to_buffer(0);
-    return_vsd_size();
-    return_driver_status();
-    write_to_block(0, 0, "hey", 3);
-    traverse(return_driver_status_log(), print);
+	traverse(return_driver_status_log(), fill_test_buffer);
+	assert(strcmp(BUFF, READ_0) == 0);
+    free_driver_status();
+
+	memset(BUFF, 0, 1000);
+	INDEX = 0;
+
+	/* READ_1 test */
+	initialize_driver_status();
+    read_block_to_buffer(-1);
+	traverse(return_driver_status_log(), fill_test_buffer);
+	assert(strcmp(BUFF, READ_1) == 0);
+    free_driver_status();
+
+	/* READ_2 test */
+	initialize_driver_status();
+    read_block_to_buffer(1048574);
+	traverse(return_driver_status_log(), print);
+	// assert(strcmp(BUFF, READ_2) == 0);
     free_driver_status();
 
     return (0);
