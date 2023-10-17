@@ -34,7 +34,7 @@ int		INDEX = 0;
 
 void    print(sll_t *node)
 {
-    printf("%s\n", node->payload);
+    printf("%s", node->payload);
 }
 
 void	fill_test_buffer(sll_t *node)
@@ -51,10 +51,11 @@ void	fill_test_buffer(sll_t *node)
 
 # define READ_0 "DRIVER_OPEN_SUCCESS0DRIVER_READ_VALID_BLOCK_INDEX_SUCCESS0DRIVER_LSEEK_SUCCESS0DRIVER_OPEN_SUCCESS0DRIVER_LSEEK_SUCCESS0DRIVER_CLOSE_SUCCESS0DRIVER_READ_WITHIN_VSD_SUCCESS0DRIVER_READ_SUCCESS0DRIVER_CLOSE_SUCCESS0"
 # define READ_1 "DRIVER_OPEN_SUCCESS0DRIVER_READ_NEGATIVE_BLOCK_INDEX_ERROR-1DRIVER_CLOSE_SUCCESS0"
+# define READ_2 "DRIVER_OPEN_SUCCESS0DRIVER_READ_VALID_BLOCK_INDEX_SUCCESS0DRIVER_LSEEK_SUCCESS0DRIVER_OPEN_SUCCESS0DRIVER_LSEEK_SUCCESS0DRIVER_CLOSE_SUCCESS0DRIVER_READ_EXCEEDS_VSD_ERROR-1DRIVER_CLOSE_SUCCESS0"
 
 int main(void)
 {
-	/* READ_0 test */
+	/* READ_0 test MIN */
     initialize_driver_status();
     read_block_to_buffer(0);
 	traverse(return_driver_status_log(), fill_test_buffer);
@@ -71,11 +72,24 @@ int main(void)
 	assert(strcmp(BUFF, READ_1) == 0);
     free_driver_status();
 
-	/* READ_2 test */
+	memset(BUFF, 0, 1000);
+	INDEX = 0;
+
+	/* READ_0 test MAX */
 	initialize_driver_status();
-    read_block_to_buffer(1048574);
-	traverse(return_driver_status_log(), print);
-	// assert(strcmp(BUFF, READ_2) == 0);
+    read_block_to_buffer(1048574); /* this is the max block index that can be read */
+	traverse(return_driver_status_log(), fill_test_buffer);
+	assert(strcmp(BUFF, READ_0) == 0);
+    free_driver_status();
+
+	memset(BUFF, 0, 1000);
+	INDEX = 0;
+
+	/* READ_2 */
+	initialize_driver_status();
+    read_block_to_buffer(1048575);
+	traverse(return_driver_status_log(), fill_test_buffer);
+	assert(strcmp(BUFF, READ_2) == 0);
     free_driver_status();
 
     return (0);
