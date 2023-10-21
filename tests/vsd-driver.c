@@ -29,12 +29,12 @@ SOFTWARE.
 #include <string.h>
 #include <stdio.h>
 
-char	BUFF[1000];
+char	BUFF[300];
 int		INDEX = 0;
 
 // void    print(sll_t *node)
 // {
-//     printf("%s", node->payload);
+//     printf("%s\n", node->payload);
 // }
 
 void	fill_test_buffer(sll_t *node)
@@ -71,7 +71,7 @@ int main(void)
 	free_driver_status();
 	assert(strcmp(BUFF, VSIZE) == 0);
 
-	memset(BUFF, 0, 1000);
+	memset(BUFF, 0, 300);
 	INDEX = 0;
 
 	/* read_block_to_buffer() */
@@ -83,7 +83,7 @@ int main(void)
 	free_driver_status();
 	assert(strcmp(BUFF, READ_0) == 0);
 
-	memset(BUFF, 0, 1000);
+	memset(BUFF, 0, 300);
 	INDEX = 0;
 
 	/* READ_1 test */
@@ -93,7 +93,7 @@ int main(void)
 	free_driver_status();
 	assert(strcmp(BUFF, READ_1) == 0);
 
-	memset(BUFF, 0, 1000);
+	memset(BUFF, 0, 300);
 	INDEX = 0;
 
 	/* READ_0 test MAX */
@@ -103,7 +103,7 @@ int main(void)
 	free_driver_status();
 	assert(strcmp(BUFF, READ_0) == 0);
 
-	memset(BUFF, 0, 1000);
+	memset(BUFF, 0, 300);
 	INDEX = 0;
 
 	/* READ_2 */
@@ -113,7 +113,7 @@ int main(void)
 	free_driver_status();
 	assert(strcmp(BUFF, READ_2) == 0);
 
-	memset(BUFF, 0, 1000);
+	memset(BUFF, 0, 300);
 	INDEX = 0;
 
 	/* write_to_block() */
@@ -125,7 +125,7 @@ int main(void)
 	free_driver_status();
 	assert(strcmp(BUFF, WRITE_0) == 0);
 
-	memset(BUFF, 0, 1000);
+	memset(BUFF, 0, 300);
 	INDEX = 0;
 
 	/* WRITE_1 test */
@@ -135,7 +135,7 @@ int main(void)
 	free_driver_status();
 	assert(strcmp(BUFF, WRITE_1) == 0);
 
-	memset(BUFF, 0, 1000);
+	memset(BUFF, 0, 300);
 	INDEX = 0;
 
 	/* WRITE_2 test */
@@ -145,7 +145,7 @@ int main(void)
 	free_driver_status();
 	assert(strcmp(BUFF, WRITE_2) == 0);
 
-	memset(BUFF, 0, 1000);
+	memset(BUFF, 0, 300);
 	INDEX = 0;
 
 	/* WRITE_0 test */
@@ -155,7 +155,7 @@ int main(void)
 	free_driver_status();
 	assert(strcmp(BUFF, WRITE_0) == 0);
 
-	memset(BUFF, 0, 1000);
+	memset(BUFF, 0, 300);
 	INDEX = 0;
 
 	/* WRITE_3 test */
@@ -165,7 +165,7 @@ int main(void)
 	free_driver_status();
 	assert(strcmp(BUFF, WRITE_3) == 0);
 
-	memset(BUFF, 0, 1000);
+	memset(BUFF, 0, 300);
 	INDEX = 0;
 
 	/* WRITE_0 test */
@@ -175,7 +175,7 @@ int main(void)
 	free_driver_status();
 	assert(strcmp(BUFF, WRITE_0) == 0);
 
-	memset(BUFF, 0, 1000);
+	memset(BUFF, 0, 300);
 	INDEX = 0;
 
 	/* WRITE_4 test */
@@ -185,12 +185,29 @@ int main(void)
 	free_driver_status();
 	assert(strcmp(BUFF, WRITE_4) == 0);
 
-	memset(BUFF, 0, 1000);
+	memset(BUFF, 0, 300);
 	INDEX = 0;
 
 	/* WRITE_4 test */
 	initialize_driver_status();
 	write_to_block(1048574, 0, TEST_STRING, 1024 * 2);
+	traverse(return_driver_status_log(), fill_test_buffer);
+	free_driver_status();
+	assert(strcmp(BUFF, WRITE_4) == 0);
+
+	/* write 1 byte to last offset of final writable block in vsd */
+	initialize_driver_status();
+	write_to_block(1048574, 1023, "w", 1);
+	read_block_to_buffer(1048574);
+	free_driver_status();
+	assert(return_buffer()[1023] == 'w');
+
+	memset(BUFF, 0, 300);
+	INDEX = 0;
+
+	/* WRITE_4 test */
+	initialize_driver_status();
+	write_to_block(1048574, 1024, "l", 1);
 	traverse(return_driver_status_log(), fill_test_buffer);
 	free_driver_status();
 	assert(strcmp(BUFF, WRITE_4) == 0);

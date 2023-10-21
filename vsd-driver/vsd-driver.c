@@ -125,7 +125,7 @@ void	write_to_block(int block_index, int offset, char *buf, int size)
 	pos = lseek(fd, block_index * VSD_BLOCK_SIZE + offset, SEEK_SET);
 	if (!handle(fd, pos, LSEEK_ERROR, LSEEK_SUCCESS, BASE))
 		return;
-	else if (!handle(fd, pos >= (return_vsd_size() - VSD_BLOCK_SIZE - 1), VWEXCEED_ERROR, VWNEXCEED_SUCCESS, CONTROL))
+	else if (!handle(fd, pos > (return_vsd_size() - VSD_BLOCK_SIZE - 1), VWEXCEED_ERROR, VWNEXCEED_SUCCESS, CONTROL))
 		return;
 	else if (!handle(fd, write(fd, buf, size), WRITE_ERROR, WRITE_SUCCESS, BASE))
 		return;
@@ -187,7 +187,7 @@ void	read_block_to_buffer(int block_index)
 	pos = lseek(fd, block_index * VSD_BLOCK_SIZE, SEEK_SET);
 	if (!handle(fd, pos, LSEEK_ERROR, LSEEK_SUCCESS, BASE))
 		return;
-	else if (!handle(fd, pos >= (return_vsd_size() - VSD_BLOCK_SIZE - 1), VREXCEED_ERROR, VRNEXCEED_SUCCESS, CONTROL))
+	else if (!handle(fd, pos > (return_vsd_size() - VSD_BLOCK_SIZE - 1), VREXCEED_ERROR, VRNEXCEED_SUCCESS, CONTROL))
 		return;
 	else if (!handle(fd, read(fd, BUF, VSD_BLOCK_SIZE), READ_ERROR, READ_SUCCESS, BASE))
 		return;
