@@ -63,6 +63,9 @@ void	free_driver_status()
 /*
 
 	update DRIVER_STATUS as well as return 0 or 1 on fail/success
+	here BASE just means messages that are from POSIX functions such as read, write etc...
+	while CONTROL means messages that are made up for controlling what would be legal write or legal read
+	to VSD
 
 */
 int	handle(int fd, int val, char *err_msg, char *suc_msg, int type)

@@ -27,7 +27,6 @@ SOFTWARE.
 #include "vsd-driver.h"
 #include <assert.h>
 #include <string.h>
-#include <stdio.h>
 
 char	BUFF[300];
 int		INDEX = 0;
